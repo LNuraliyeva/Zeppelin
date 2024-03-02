@@ -5,7 +5,7 @@
 #define INCLUDE_GAMEPAD_MODULE
 #include <DabbleESP32.h>
 
-#define MOTOR34_DIR_PIN 35
+#define MOTOR34_DIR_PIN 32
 #define MOTOR34_ENABLE_PIN 26
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
@@ -14,14 +14,14 @@
 
 void set_high(int dirPin, int enPin){
 
-  digitalWrite(dirPin, HIGH);
-  analogWrite(enPin, 200);
+  digitalWrite(dirPin, LOW);
+  digitalWrite(enPin, HIGH);
 }
 
 void set_low(int dirPin, int enPin){
 
-  digitalWrite(dirPin, HIGH);
-  analogWrite(enPin, 200);
+  digitalWrite(dirPin, LOW);
+  digitalWrite(enPin, HIGH);
 }
 
 void move_forward(int dirPin, int enPin, int current_speed, int increment){
@@ -31,10 +31,10 @@ void move_forward(int dirPin, int enPin, int current_speed, int increment){
   analogWrite(enPin, current_speed);
 }
 
-void move (int pin1, int pin2, int pwm){
-  analogWrite(pin1, 0);
-  analogWrite(pin2, pwm);
-}
+// void move (int pin1, int pin2, int pwm){
+//   analogWrite(pin1, 0);
+//   analogWrite(pin2, pwm);
+// }
 
 void stop_motor(int dirPin, int enPin, int current_speed){
 
@@ -78,13 +78,13 @@ void loop() {
 
   int ourConst = radius * 36;
   int speed = 0;
-  int pwm = ourConst;
+  //int pwm = ourConst;
   
   if(45 <= angle && angle < 135){ // UP
 
-      //move_forward(MOTOR34_DIR_PIN, MOTOR34_ENABLE_PIN, speed, ourConst);
-      //move_forward(MOTOR34_ENABLE_PIN, MOTOR34_DIR_PIN, speed, ourConst);
-      move(MOTOR34_DIR_PIN, MOTOR34_ENABLE_PIN, pwm);
+      move_forward(MOTOR34_DIR_PIN, MOTOR34_ENABLE_PIN, speed, ourConst);
+      
+      //move(MOTOR34_DIR_PIN, MOTOR34_ENABLE_PIN, pwm);
 
   // } else if( (315 <= angle || angle < 45) && angle != 0){ // RIGHT
 
@@ -96,14 +96,14 @@ void loop() {
       
   }else if( 225 < angle && angle  < 315){ //DOWN
 
-      //move_forward(MOTOR34_ENABLE_PIN, MOTOR34_DIR_PIN, speed, ourConst);
-      //move(MOTOR34_ENABLE_PIN, MOTOR34_DIR_PIN, pwm);
-      Serial.print("Pulled Down");
+      move_forward(MOTOR34_ENABLE_PIN, MOTOR34_DIR_PIN, speed, ourConst);
+      
 
   }else if(radius == 0){ // STOP
 
       stop_motor(MOTOR34_DIR_PIN, MOTOR34_ENABLE_PIN, speed);
-      
+      stop_motor(MOTOR34_ENABLE_PIN, MOTOR34_DIR_PIN, speed);
+       
   }
 
 
@@ -120,7 +120,7 @@ void loop() {
 
   if (GamePad.isCrossPressed())
   {
-    set_low(MOTOR34_DIR_PIN, MOTOR34_ENABLE_PIN);
+    set_low(MOTOR34_ENABLE_PIN, MOTOR34_DIR_PIN);
   
   }
 
