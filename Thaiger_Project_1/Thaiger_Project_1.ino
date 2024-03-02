@@ -52,7 +52,6 @@ void setup() {
   pinMode(MOTOR_FORW_BACKW_PIN2, OUTPUT);
   pinMode(MOTOR_UP_DOWN_PIN1, OUTPUT); 
   pinMode(MOTOR_UP_DOWN_PIN2, OUTPUT);
-
   pinMode(FRONT_LEFT_RIGHT_PIN1, OUTPUT); 
   pinMode(FRONT_LEFT_RIGHT_PIN2, OUTPUT);
   pinMode(BACK_LEFT_RIGHT_PIN1, OUTPUT); 
@@ -60,6 +59,10 @@ void setup() {
 
   stop_motor(MOTOR_UP_DOWN_PIN1, MOTOR_UP_DOWN_PIN2, 255);
   stop_motor(MOTOR_UP_DOWN_PIN2, MOTOR_UP_DOWN_PIN1, 255);
+  stop_motor(FRONT_LEFT_RIGHT_PIN1, FRONT_LEFT_RIGHT_PIN2, 255);
+  stop_motor(FRONT_LEFT_RIGHT_PIN2, FRONT_LEFT_RIGHT_PIN1, 255);
+  stop_motor(BACK_LEFT_RIGHT_PIN1, BACK_LEFT_RIGHT_PIN2, 255);
+  stop_motor(BACK_LEFT_RIGHT_PIN2, BACK_LEFT_RIGHT_PIN1, 255);
 
   Dabble.begin("ESP32"); 
 }
@@ -68,6 +71,11 @@ void setup() {
 void loop() {
   stop_motor(MOTOR_UP_DOWN_PIN1, MOTOR_UP_DOWN_PIN2, 255);
   stop_motor(MOTOR_UP_DOWN_PIN2, MOTOR_UP_DOWN_PIN1, 255);
+  stop_motor(FRONT_LEFT_RIGHT_PIN1, FRONT_LEFT_RIGHT_PIN2, 255);
+  stop_motor(FRONT_LEFT_RIGHT_PIN2, FRONT_LEFT_RIGHT_PIN1, 255);
+  stop_motor(BACK_LEFT_RIGHT_PIN1, BACK_LEFT_RIGHT_PIN2, 255);
+  stop_motor(BACK_LEFT_RIGHT_PIN2, BACK_LEFT_RIGHT_PIN1, 255);
+  
   Dabble.processInput();
 
   int radius = GamePad.getRadius();
@@ -77,17 +85,14 @@ void loop() {
 
   if(45 <= angle && angle < 135){ // FORWARD
       move(MOTOR_FORW_BACKW_PIN1, MOTOR_FORW_BACKW_PIN2, speed, pwm);
-      
-      //move(MOTOR_FORW_BACKW_PIN1, MOTOR_FORW_BACKW_PIN2, pwm);
-
-  } else if(315 <= angle || angle < 45){ // RIGHT
-
+  } 
+  else if(315 <= angle || angle < 45){ // RIGHT
       move(FRONT_LEFT_RIGHT_PIN1, FRONT_LEFT_RIGHT_PIN2, speed, pwm);
-  
-  } else if(135 <= angle && angle <= 225){ //LEFT
-
       move(BACK_LEFT_RIGHT_PIN1, BACK_LEFT_RIGHT_PIN2, speed, pwm);    
-      
+  } 
+  else if(135 <= angle && angle <= 225){ //LEFT
+      move(FRONT_LEFT_RIGHT_PIN2, FRONT_LEFT_RIGHT_PIN1, speed, pwm);
+      move(BACK_LEFT_RIGHT_PIN2, BACK_LEFT_RIGHT_PIN1, speed, pwm);    
   }
   else if( 225 < angle && angle  < 315){ //BACKWARD
       move(MOTOR_FORW_BACKW_PIN2, MOTOR_FORW_BACKW_PIN1, speed, pwm);    
@@ -95,15 +100,28 @@ void loop() {
   else if(radius == 0){ // STOP
       stop_motor(MOTOR_FORW_BACKW_PIN1, MOTOR_FORW_BACKW_PIN2, pwm);
       stop_motor(MOTOR_FORW_BACKW_PIN2, MOTOR_FORW_BACKW_PIN1, pwm);
+      
+      if(!GamePad.isSquarePressed()){
+        stop_motor(FRONT_LEFT_RIGHT_PIN1, FRONT_LEFT_RIGHT_PIN2, 255);
+        stop_motor(BACK_LEFT_RIGHT_PIN2, BACK_LEFT_RIGHT_PIN1, 255);
+      }
+      if(!GamePad.isCirclePressed()){
+        stop_motor(BACK_LEFT_RIGHT_PIN2, BACK_LEFT_RIGHT_PIN1, 255);
+        stop_motor(FRONT_LEFT_RIGHT_PIN1, FRONT_LEFT_RIGHT_PIN2, 255);
+      }
   }
 
 
-  if (GamePad.isSquarePressed()){
-    Serial.print("Square");
+  if (GamePad.isSquarePressed()){ //LINKS UM DIE EIGENE ACHSE
+    // FRONT MOTOREN LINKS + HINTERE RECHTS 
+    full_speed(FRONT_LEFT_RIGHT_PIN1, FRONT_LEFT_RIGHT_PIN2);
+    full_speed(BACK_LEFT_RIGHT_PIN2, BACK_LEFT_RIGHT_PIN1);
   }
 
-  if (GamePad.isCirclePressed()){
-    Serial.print("Circle");
+  if (GamePad.isCirclePressed()){ //RECHTS UM DIE EIGENE ACHSE
+    // FRONT MOTOREN RECHTS + HINTERE LINKS 
+    full_speed(FRONT_LEFT_RIGHT_PIN2, FRONT_LEFT_RIGHT_PIN1);
+    full_speed(BACK_LEFT_RIGHT_PIN1, BACK_LEFT_RIGHT_PIN2);
   }
 
   if (GamePad.isCrossPressed()){ //DOWN
