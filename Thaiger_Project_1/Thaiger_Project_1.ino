@@ -106,8 +106,8 @@ void loop() {
         stop_motor(BACK_LEFT_RIGHT_PIN2, BACK_LEFT_RIGHT_PIN1, 255);
       }
       if(!GamePad.isCirclePressed()){
-        stop_motor(BACK_LEFT_RIGHT_PIN2, BACK_LEFT_RIGHT_PIN1, 255);
-        stop_motor(FRONT_LEFT_RIGHT_PIN1, FRONT_LEFT_RIGHT_PIN2, 255);
+        stop_motor(FRONT_LEFT_RIGHT_PIN2, FRONT_LEFT_RIGHT_PIN1, 255);
+        stop_motor(BACK_LEFT_RIGHT_PIN1, BACK_LEFT_RIGHT_PIN2, 255);
       }
   }
 
