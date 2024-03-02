@@ -5,117 +5,99 @@
 #define INCLUDE_GAMEPAD_MODULE
 #include <DabbleESP32.h>
 
-#define MOTOR34_DIR_PIN 12
-#define MOTOR34_ENABLE_PIN 13
+#define MOTOR_FORW_BACKW_PIN1 12
+#define MOTOR_FORW_BACKW_PIN2 13
+#define MOTOR_UP_DOWN_PIN1 14
+#define MOTOR_UP_DOWN_PIN2 27
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
 #endif
 
-void full_speed(int pin1, int pin2, bool foreward){
 
-  if (foreward){
+void full_speed(int pin1, int pin2){
+  for (int i = 0; i >= 255; i += 15){
     digitalWrite(pin1, LOW);
     digitalWrite(pin2, HIGH);
-  }else{
-    digitalWrite(pin1, HIGH);
-    digitalWrite(pin2, LOW);
-  
   }
 }
 
-void move(int pin1, int pin2, int current_speed, int increment){
 
+void move(int pin1, int pin2, int current_speed, int pwm){
   digitalWrite(pin1, LOW);
-  current_speed += increment;
+  current_speed += pwm;
   analogWrite(pin2, current_speed);
+  analogWrite(pin2, pwm);
 }
 
-void stop_motor(int pin1, int pin2, int current_speed){
 
+void stop_motor(int pin1, int pin2, int current_speed){
   for (int i = current_speed; i == 0; i -= 15)
       {
         analogWrite(pin2, i);
         delay(500);
       }
-
       digitalWrite(pin1, LOW);
-
 }
+
 
 void setup() {
-
   Serial.begin(115200);
 
-  pinMode(MOTOR34_DIR_PIN, OUTPUT); 
-  pinMode(MOTOR34_ENABLE_PIN, OUTPUT);
-
+  pinMode(MOTOR_FORW_BACKW_PIN1, OUTPUT); 
+  pinMode(MOTOR_FORW_BACKW_PIN2, OUTPUT);
 
   Dabble.begin("ESP32"); 
-
+  stop_motor(MOTOR_UP_DOWN_PIN1, MOTOR_UP_DOWN_PIN2, 255);
 }
-
 
 
 void loop() {
-
+  stop_motor(MOTOR_UP_DOWN_PIN1, MOTOR_UP_DOWN_PIN2, 255);
   Dabble.processInput();
 
   int radius = GamePad.getRadius();
   int angle = GamePad.getAngle();
-
-  int ourConst = radius * 36;
   int speed = 0;
-  //int pwm = ourConst;
-  
-  if(45 <= angle && angle < 135){ // UP
+  int pwm = radius * 36;
 
-      move_forward(MOTOR34_DIR_PIN, MOTOR34_ENABLE_PIN, speed, ourConst);
+  if(45 <= angle && angle < 135){ // FORWARD
+      move(MOTOR_FORW_BACKW_PIN1, MOTOR_FORW_BACKW_PIN2, speed, pwm);
       
-      //move(MOTOR34_DIR_PIN, MOTOR34_ENABLE_PIN, pwm);
+      //move(MOTOR_FORW_BACKW_PIN1, MOTOR_FORW_BACKW_PIN2, pwm);
 
   // } else if( (315 <= angle || angle < 45) && angle != 0){ // RIGHT
 
-  //     stop_motor(MOTOR34_DIR_PIN, MOTOR34_ENABLE_PIN, speed);
+  //     stop_motor(MOTOR_FORW_BACKW_PIN1, MOTOR_FORW_BACKW_PIN2, speed);
   
   // } else if(135 <= angle && angle <= 225){ //LEFT
 
-  //     stop_motor(MOTOR34_DIR_PIN, MOTOR34_ENABLE_PIN, speed);    
+  //     stop_motor(MOTOR_FORW_BACKW_PIN1, MOTOR_FORW_BACKW_PIN2, speed);    
       
-  }else if( 225 < angle && angle  < 315){ //DOWN
-
-      move_forward(MOTOR34_ENABLE_PIN, MOTOR34_DIR_PIN, speed, ourConst);
-      
-
-  }else if(radius == 0){ // STOP
-
-      stop_motor(MOTOR34_DIR_PIN, MOTOR34_ENABLE_PIN, speed);
-      stop_motor(MOTOR34_ENABLE_PIN, MOTOR34_DIR_PIN, speed);
-       
+  }
+  else if( 225 < angle && angle  < 315){ //BACKWARD
+      move(MOTOR_FORW_BACKW_PIN2, MOTOR_FORW_BACKW_PIN1, speed, pwm);    
+  }
+  else if(radius == 0){ // STOP
+      stop_motor(MOTOR_FORW_BACKW_PIN1, MOTOR_FORW_BACKW_PIN2, pwm);
+      stop_motor(MOTOR_FORW_BACKW_PIN2, MOTOR_FORW_BACKW_PIN1, pwm);
   }
 
 
-  if (GamePad.isSquarePressed())
-  {
-
+  if (GamePad.isSquarePressed()){
     Serial.print("Square");
   }
 
-  if (GamePad.isCirclePressed())
-  {
+  if (GamePad.isCirclePressed()){
     Serial.print("Circle");
   }
 
-  if (GamePad.isCrossPressed())
-  {
-    set_low(MOTOR34_ENABLE_PIN, MOTOR34_DIR_PIN);
-  
+  if (GamePad.isCrossPressed()){ //DOWN
+    full_speed(MOTOR_UP_DOWN_PIN1, MOTOR_UP_DOWN_PIN2);
   }
 
-  if (GamePad.isTrianglePressed())
-  {
-    set_high(MOTOR34_DIR_PIN, MOTOR34_ENABLE_PIN);
-  
+  if (GamePad.isTrianglePressed()){ //UP
+    full_speed(MOTOR_UP_DOWN_PIN2, MOTOR_UP_DOWN_PIN1);
   }
 
   delay(500);
