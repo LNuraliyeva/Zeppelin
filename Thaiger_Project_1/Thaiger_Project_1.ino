@@ -102,12 +102,18 @@ void loop() {
       stop_motor(MOTOR_FORW_BACKW_PIN2, MOTOR_FORW_BACKW_PIN1, pwm);
       
       if(!GamePad.isSquarePressed()){
-        stop_motor(FRONT_LEFT_RIGHT_PIN1, FRONT_LEFT_RIGHT_PIN2, 255);
-        stop_motor(BACK_LEFT_RIGHT_PIN2, BACK_LEFT_RIGHT_PIN1, 255);
+        stop_motor(FRONT_LEFT_RIGHT_PIN1, FRONT_LEFT_RIGHT_PIN2, pwm);
+        stop_motor(FRONT_LEFT_RIGHT_PIN2, FRONT_LEFT_RIGHT_PIN1, pwm);
+
+        stop_motor(BACK_LEFT_RIGHT_PIN2, BACK_LEFT_RIGHT_PIN1, pwm);
+        stop_motor(BACK_LEFT_RIGHT_PIN1, BACK_LEFT_RIGHT_PIN2, pwm);
       }
       if(!GamePad.isCirclePressed()){
-        stop_motor(FRONT_LEFT_RIGHT_PIN2, FRONT_LEFT_RIGHT_PIN1, 255);
-        stop_motor(BACK_LEFT_RIGHT_PIN1, BACK_LEFT_RIGHT_PIN2, 255);
+        stop_motor(FRONT_LEFT_RIGHT_PIN1, FRONT_LEFT_RIGHT_PIN2, pwm);
+        stop_motor(FRONT_LEFT_RIGHT_PIN2, FRONT_LEFT_RIGHT_PIN1, pwm);
+
+        stop_motor(BACK_LEFT_RIGHT_PIN2, BACK_LEFT_RIGHT_PIN1, pwm);
+        stop_motor(BACK_LEFT_RIGHT_PIN1, BACK_LEFT_RIGHT_PIN2, pwm);
       }
   }
 
