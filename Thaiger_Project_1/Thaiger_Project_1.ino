@@ -5,55 +5,43 @@
 #define INCLUDE_GAMEPAD_MODULE
 #include <DabbleESP32.h>
 
-#define MOTOR34_DIR_PIN 32
-#define MOTOR34_ENABLE_PIN 26
+#define MOTOR34_DIR_PIN 12
+#define MOTOR34_ENABLE_PIN 13
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
 #endif
 
-void set_high(int dirPin, int enPin){
+void full_speed(int pin1, int pin2, bool foreward){
 
-  digitalWrite(dirPin, LOW);
-  digitalWrite(enPin, HIGH);
+  if (foreward){
+    digitalWrite(pin1, LOW);
+    digitalWrite(pin2, HIGH);
+  }else{
+    digitalWrite(pin1, HIGH);
+    digitalWrite(pin2, LOW);
+  
+  }
 }
 
-void set_low(int dirPin, int enPin){
+void move(int pin1, int pin2, int current_speed, int increment){
 
-  digitalWrite(dirPin, LOW);
-  digitalWrite(enPin, HIGH);
-}
-
-void move_forward(int dirPin, int enPin, int current_speed, int increment){
-
-  digitalWrite(dirPin, LOW);
+  digitalWrite(pin1, LOW);
   current_speed += increment;
-  analogWrite(enPin, current_speed);
+  analogWrite(pin2, current_speed);
 }
 
-// void move (int pin1, int pin2, int pwm){
-//   analogWrite(pin1, 0);
-//   analogWrite(pin2, pwm);
-// }
-
-void stop_motor(int dirPin, int enPin, int current_speed){
+void stop_motor(int pin1, int pin2, int current_speed){
 
   for (int i = current_speed; i == 0; i -= 15)
       {
-        analogWrite(enPin, i);
+        analogWrite(pin2, i);
         delay(500);
       }
 
-      digitalWrite(dirPin, LOW);
+      digitalWrite(pin1, LOW);
 
 }
-
-// void move_backward(int dirPin, int enPin, int current_speed, int increment){
-
-//   digitalWrite(dirPin, LOW);
-//   current_speed += increment;
-//   analogWrite(enPin, current_speed);
-// }
 
 void setup() {
 
