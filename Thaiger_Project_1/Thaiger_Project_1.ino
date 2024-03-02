@@ -9,6 +9,10 @@
 #define MOTOR_FORW_BACKW_PIN2 13
 #define MOTOR_UP_DOWN_PIN1 14
 #define MOTOR_UP_DOWN_PIN2 27
+#define FRONT_LEFT_RIGHT_PIN1 26
+#define FRONT_LEFT_RIGHT_PIN2 25
+#define BACK_LEFT_RIGHT_PIN1 33
+#define BACK_LEFT_RIGHT_PIN2 32
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
@@ -16,7 +20,7 @@
 
 
 void full_speed(int pin1, int pin2){
-  for (int i = 0; i >= 255; i += 15){
+  for (int i = 0; i <= 255; i += 15){
     digitalWrite(pin1, LOW);
     digitalWrite(pin2, HIGH);
   }
@@ -46,14 +50,19 @@ void setup() {
 
   pinMode(MOTOR_FORW_BACKW_PIN1, OUTPUT); 
   pinMode(MOTOR_FORW_BACKW_PIN2, OUTPUT);
+  pinMode(MOTOR_UP_DOWN_PIN1, OUTPUT); 
+  pinMode(MOTOR_UP_DOWN_PIN2, OUTPUT);
+
+  stop_motor(MOTOR_UP_DOWN_PIN1, MOTOR_UP_DOWN_PIN2, 255);
+  stop_motor(MOTOR_UP_DOWN_PIN2, MOTOR_UP_DOWN_PIN1, 255);
 
   Dabble.begin("ESP32"); 
-  stop_motor(MOTOR_UP_DOWN_PIN1, MOTOR_UP_DOWN_PIN2, 255);
 }
 
 
 void loop() {
   stop_motor(MOTOR_UP_DOWN_PIN1, MOTOR_UP_DOWN_PIN2, 255);
+  stop_motor(MOTOR_UP_DOWN_PIN2, MOTOR_UP_DOWN_PIN1, 255);
   Dabble.processInput();
 
   int radius = GamePad.getRadius();
@@ -94,10 +103,17 @@ void loop() {
 
   if (GamePad.isCrossPressed()){ //DOWN
     full_speed(MOTOR_UP_DOWN_PIN1, MOTOR_UP_DOWN_PIN2);
+    delay(500);
   }
 
   if (GamePad.isTrianglePressed()){ //UP
     full_speed(MOTOR_UP_DOWN_PIN2, MOTOR_UP_DOWN_PIN1);
+    delay(500);
+  }
+
+  if (GamePad.isSelectPressed()){
+    stop_motor(MOTOR_UP_DOWN_PIN1, MOTOR_UP_DOWN_PIN2, 255);
+    stop_motor(MOTOR_UP_DOWN_PIN2, MOTOR_UP_DOWN_PIN1, 255);
   }
 
   delay(500);
