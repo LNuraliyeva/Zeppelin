@@ -53,6 +53,11 @@ void setup() {
   pinMode(MOTOR_UP_DOWN_PIN1, OUTPUT); 
   pinMode(MOTOR_UP_DOWN_PIN2, OUTPUT);
 
+  pinMode(FRONT_LEFT_RIGHT_PIN1, OUTPUT); 
+  pinMode(FRONT_LEFT_RIGHT_PIN2, OUTPUT);
+  pinMode(BACK_LEFT_RIGHT_PIN1, OUTPUT); 
+  pinMode(BACK_LEFT_RIGHT_PIN2, OUTPUT);
+
   stop_motor(MOTOR_UP_DOWN_PIN1, MOTOR_UP_DOWN_PIN2, 255);
   stop_motor(MOTOR_UP_DOWN_PIN2, MOTOR_UP_DOWN_PIN1, 255);
 
@@ -75,13 +80,13 @@ void loop() {
       
       //move(MOTOR_FORW_BACKW_PIN1, MOTOR_FORW_BACKW_PIN2, pwm);
 
-  // } else if( (315 <= angle || angle < 45) && angle != 0){ // RIGHT
+  } else if(315 <= angle || angle < 45){ // RIGHT
 
-  //     stop_motor(MOTOR_FORW_BACKW_PIN1, MOTOR_FORW_BACKW_PIN2, speed);
+      move(FRONT_LEFT_RIGHT_PIN1, FRONT_LEFT_RIGHT_PIN2, speed, pwm);
   
-  // } else if(135 <= angle && angle <= 225){ //LEFT
+  } else if(135 <= angle && angle <= 225){ //LEFT
 
-  //     stop_motor(MOTOR_FORW_BACKW_PIN1, MOTOR_FORW_BACKW_PIN2, speed);    
+      move(BACK_LEFT_RIGHT_PIN1, BACK_LEFT_RIGHT_PIN2, speed, pwm);    
       
   }
   else if( 225 < angle && angle  < 315){ //BACKWARD
