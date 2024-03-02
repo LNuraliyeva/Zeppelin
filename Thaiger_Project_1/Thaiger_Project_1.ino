@@ -21,14 +21,14 @@
 
 void full_speed(int pin1, int pin2){
   for (int i = 0; i <= 255; i += 15){
-    digitalWrite(pin1, LOW);
-    digitalWrite(pin2, HIGH);
+    analogWrite(pin1, 0);
+    analogWrite(pin2, 255);
   }
 }
 
 
 void move(int pin1, int pin2, int current_speed, int pwm){
-  digitalWrite(pin1, LOW);
+  analogWrite(pin1, 0);
   current_speed += pwm;
   analogWrite(pin2, current_speed);
 }
@@ -43,6 +43,15 @@ void stop_motor(int pin1, int pin2, int current_speed){
   //     digitalWrite(pin1, LOW);
   analogWrite(pin1, 0);
   analogWrite(pin2, 0);
+}
+
+void stop_motor2(int pin1, int pin2, int current_speed){
+  for (int i = current_speed; i == 0; i -= 15)
+      {
+        analogWrite(pin2, i);
+        delay(500);
+      }
+      digitalWrite(pin1, LOW);
 }
 
 
@@ -72,10 +81,12 @@ void setup() {
 void loop() {
   stop_motor(MOTOR_UP_DOWN_PIN1, MOTOR_UP_DOWN_PIN2, 255);
   stop_motor(MOTOR_UP_DOWN_PIN2, MOTOR_UP_DOWN_PIN1, 255);
-  // stop_motor(FRONT_LEFT_RIGHT_PIN1, FRONT_LEFT_RIGHT_PIN2, 255);
-  // stop_motor(FRONT_LEFT_RIGHT_PIN2, FRONT_LEFT_RIGHT_PIN1, 255);
-  // stop_motor(BACK_LEFT_RIGHT_PIN1, BACK_LEFT_RIGHT_PIN2, 255);
-  // stop_motor(BACK_LEFT_RIGHT_PIN2, BACK_LEFT_RIGHT_PIN1, 255);
+  stop_motor(MOTOR_FORW_BACKW_PIN1, MOTOR_FORW_BACKW_PIN2, 255);
+  stop_motor(MOTOR_FORW_BACKW_PIN2, MOTOR_FORW_BACKW_PIN1, 255);
+  stop_motor(FRONT_LEFT_RIGHT_PIN1, FRONT_LEFT_RIGHT_PIN2, 255);
+  stop_motor(FRONT_LEFT_RIGHT_PIN2, FRONT_LEFT_RIGHT_PIN1, 255);
+  stop_motor(BACK_LEFT_RIGHT_PIN1, BACK_LEFT_RIGHT_PIN2, 255);
+  stop_motor(BACK_LEFT_RIGHT_PIN2, BACK_LEFT_RIGHT_PIN1, 255);
   
   Dabble.processInput();
 
@@ -99,10 +110,12 @@ void loop() {
       move(MOTOR_FORW_BACKW_PIN2, MOTOR_FORW_BACKW_PIN1, speed, pwm);    
   }
   else if(radius == 0){ // STOP
+      stop_motor2(MOTOR_FORW_BACKW_PIN1, MOTOR_FORW_BACKW_PIN2, pwm);
+      stop_motor2(MOTOR_FORW_BACKW_PIN2, MOTOR_FORW_BACKW_PIN1, pwm);
       stop_motor(MOTOR_FORW_BACKW_PIN1, MOTOR_FORW_BACKW_PIN2, pwm);
       stop_motor(MOTOR_FORW_BACKW_PIN2, MOTOR_FORW_BACKW_PIN1, pwm);
       
-      if(!(GamePad.isSquarePressed())){
+      if((!GamePad.isSquarePressed())){
         stop_motor(FRONT_LEFT_RIGHT_PIN1, FRONT_LEFT_RIGHT_PIN2, pwm);
         // stop_motor(FRONT_LEFT_RIGHT_PIN2, FRONT_LEFT_RIGHT_PIN1, pwm);
 
