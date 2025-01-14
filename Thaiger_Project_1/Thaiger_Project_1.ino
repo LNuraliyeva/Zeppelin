@@ -18,7 +18,7 @@
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
 #endif
 
-
+// Funktion: Motor auf volle Geschwindigkeit setzen
 void full_speed(int pin1, int pin2){
   for (int i = 0; i <= 255; i += 15){
     analogWrite(pin1, 0);
@@ -26,25 +26,20 @@ void full_speed(int pin1, int pin2){
   }
 }
 
-
+// Funktion: Motor mit bestimmter Geschwindigkeit bewegen
 void move(int pin1, int pin2, int current_speed, int pwm){
   analogWrite(pin1, 0);
   current_speed += pwm;
   analogWrite(pin2, current_speed);
 }
 
-
+// Funktion: Motor stoppen
 void stop_motor(int pin1, int pin2, int current_speed){
-  // for (int i = current_speed; i == 0; i -= 15)
-  //     {
-  //       analogWrite(pin2, i);
-  //       delay(500);
-  //     }
-  //     digitalWrite(pin1, LOW);
   analogWrite(pin1, 0);
   analogWrite(pin2, 0);
 }
 
+// Alternative Stop-Funktion: Motor langsamer anhalten
 void stop_motor2(int pin1, int pin2, int current_speed){
   for (int i = current_speed; i == 0; i -= 15)
       {
@@ -54,10 +49,11 @@ void stop_motor2(int pin1, int pin2, int current_speed){
       digitalWrite(pin1, LOW);
 }
 
-
+// Setup-Funktion: Initialisierung von Pins und Modulen
 void setup() {
   Serial.begin(115200);
 
+  // Pin-Modi für Motoren festlegen
   pinMode(MOTOR_FORW_BACKW_PIN1, OUTPUT); 
   pinMode(MOTOR_FORW_BACKW_PIN2, OUTPUT);
   pinMode(MOTOR_UP_DOWN_PIN1, OUTPUT); 
@@ -67,6 +63,7 @@ void setup() {
   pinMode(BACK_LEFT_RIGHT_PIN1, OUTPUT); 
   pinMode(BACK_LEFT_RIGHT_PIN2, OUTPUT);
 
+  // Motoren initial stoppen
   stop_motor(MOTOR_UP_DOWN_PIN1, MOTOR_UP_DOWN_PIN2, 255);
   stop_motor(MOTOR_UP_DOWN_PIN2, MOTOR_UP_DOWN_PIN1, 255);
   stop_motor(FRONT_LEFT_RIGHT_PIN1, FRONT_LEFT_RIGHT_PIN2, 255);
@@ -74,10 +71,11 @@ void setup() {
   stop_motor(BACK_LEFT_RIGHT_PIN1, BACK_LEFT_RIGHT_PIN2, 255);
   stop_motor(BACK_LEFT_RIGHT_PIN2, BACK_LEFT_RIGHT_PIN1, 255);
 
+  // Bluetooth initialisieren
   Dabble.begin("ESP32"); 
 }
 
-
+// Hauptprogramm (Loop)
 void loop() {
   stop_motor(MOTOR_UP_DOWN_PIN1, MOTOR_UP_DOWN_PIN2, 255);
   stop_motor(MOTOR_UP_DOWN_PIN2, MOTOR_UP_DOWN_PIN1, 255);
@@ -87,14 +85,17 @@ void loop() {
   stop_motor(FRONT_LEFT_RIGHT_PIN2, FRONT_LEFT_RIGHT_PIN1, 255);
   stop_motor(BACK_LEFT_RIGHT_PIN1, BACK_LEFT_RIGHT_PIN2, 255);
   stop_motor(BACK_LEFT_RIGHT_PIN2, BACK_LEFT_RIGHT_PIN1, 255);
-  
+
+  // Eingaben verarbeiten
   Dabble.processInput();
 
+  // GamePad-Steuerung auslesen
   int radius = GamePad.getRadius();
   int angle = GamePad.getAngle();
   int speed = 0;
   int pwm = radius * 36;
 
+  // Bewegungslogik basierend auf GamePad-Winkel
   if(45 <= angle && angle < 135){ // FORWARD
       move(MOTOR_FORW_BACKW_PIN1, MOTOR_FORW_BACKW_PIN2, speed, pwm);
   } 
@@ -130,30 +131,29 @@ void loop() {
         stop_motor(BACK_LEFT_RIGHT_PIN1, BACK_LEFT_RIGHT_PIN2, pwm);
       }
   }
-
-
-  if (GamePad.isSquarePressed()){ //LINKS UM DIE EIGENE ACHSE
-    // FRONT MOTOREN LINKS + HINTERE RECHTS 
+  //LINKS UM DIE EIGENE ACHSE
+  // FRONT MOTOREN LINKS + HINTERE RECHTS
+  if (GamePad.isSquarePressed()){  
     full_speed(FRONT_LEFT_RIGHT_PIN1, FRONT_LEFT_RIGHT_PIN2);
     full_speed(BACK_LEFT_RIGHT_PIN2, BACK_LEFT_RIGHT_PIN1);
   }
-
-  if (GamePad.isCirclePressed()){ //RECHTS UM DIE EIGENE ACHSE
-    // FRONT MOTOREN RECHTS + HINTERE LINKS 
+  //RECHTS UM DIE EIGENE ACHSE
+  // FRONT MOTOREN RECHTS + HINTERE LINKS 
+  if (GamePad.isCirclePressed()){
     full_speed(FRONT_LEFT_RIGHT_PIN2, FRONT_LEFT_RIGHT_PIN1);
     full_speed(BACK_LEFT_RIGHT_PIN1, BACK_LEFT_RIGHT_PIN2);
   }
-
-  if (GamePad.isCrossPressed()){ //DOWN
+  //DOWN
+  if (GamePad.isCrossPressed()){ 
     full_speed(MOTOR_UP_DOWN_PIN1, MOTOR_UP_DOWN_PIN2);
     delay(500);
   }
 
-  if (GamePad.isTrianglePressed()){ //UP
+  if (GamePad.isTrianglePressed()){ 
     full_speed(MOTOR_UP_DOWN_PIN2, MOTOR_UP_DOWN_PIN1);
     delay(500);
   }
-
+  //UP
   if (GamePad.isSelectPressed()){
     stop_motor(MOTOR_UP_DOWN_PIN1, MOTOR_UP_DOWN_PIN2, 255);
     stop_motor(MOTOR_UP_DOWN_PIN2, MOTOR_UP_DOWN_PIN1, 255);
@@ -165,5 +165,5 @@ void loop() {
     stop_motor(BACK_LEFT_RIGHT_PIN2, BACK_LEFT_RIGHT_PIN1, 255);
   }
 
-  delay(500);
+  delay(500); // Wartezeit zwischen Loop-Durchläufen
 }
